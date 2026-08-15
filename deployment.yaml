@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      name: mycont1
+      image: anooppuli/phpapp:appimage
+      ports:
+        - containerPort: 80
+
+      #ConfigMap integration
+      envFrom:
+        - configMapRef:
+            name: bankapp-config
+    
+      #ResourceQuota integration
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "200m"
+          memory: "256Mi"
+
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 30
+        periodSeconds: 10
+
+      readinessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 5
